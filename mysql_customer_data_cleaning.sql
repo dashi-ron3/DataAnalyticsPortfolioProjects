@@ -1,20 +1,20 @@
 
 CREATE TABLE customers_staging
 LIKE customers
-; #gets all columns from customers
+; --gets all columns from customers
 
 INSERT customers_staging
 SELECT *
 FROM customers
-; #inserting all data from customers
+; --inserting all data from customers
 
 SELECT *
 FROM customers_staging;
 
+
 -- Removed leading/trailing spaces and format name to Proper case
 UPDATE customers_staging
 SET
-    -- First Name Proper Case
     first_name = CONCAT(
         UPPER(LEFT(TRIM(first_name), 1)),
         LOWER(SUBSTRING(TRIM(first_name), 2))
@@ -50,21 +50,19 @@ WHERE phone IS NOT NULL;
 -- turn phone numbers into standard XXX-XXX-XXXX format
 UPDATE customers_staging
 SET phone = CASE
-    -- If 11 digits starting with 1 → remove the leading 1
     WHEN LENGTH(phone) = 11 AND LEFT(phone, 1) = '1' THEN
         CONCAT(
-            SUBSTRING(phone, 2, 3), '-',   -- area code
-            SUBSTRING(phone, 5, 3), '-',   -- central office code
-            SUBSTRING(phone, 8, 4)         -- line number
+            SUBSTRING(phone, 2, 3), '-',   
+            SUBSTRING(phone, 5, 3), '-',   
+            SUBSTRING(phone, 8, 4)         
         )
-    -- If already 10 digits → format directly
     WHEN LENGTH(phone) = 10 THEN
         CONCAT(
             SUBSTRING(phone, 1, 3), '-',
             SUBSTRING(phone, 4, 3), '-',
             SUBSTRING(phone, 7, 4)
         )
-    ELSE phone -- leave other cases untouched
+    ELSE phone 
 END;
 
 -- cleaning email entries 
@@ -139,7 +137,7 @@ WITH ranked AS (
         ROW_NUMBER() OVER (
             PARTITION BY first_name, last_name, signup_date_clean,
             LOWER(TRIM(first_name)), LOWER(TRIM(last_name))
-            ORDER BY signup_date_clean DESC  -- keep the latest signup
+            ORDER BY signup_date_clean DESC
         ) AS rn
     FROM customers_staging
 )
@@ -148,6 +146,7 @@ FROM customers_staging
 WHERE id IN (SELECT id FROM ranked WHERE rn > 1);
 
 SELECT * FROM customers_staging;
+
 
 -- create a table with the cleaned data
 CREATE TABLE customers_clean AS
