@@ -29,20 +29,17 @@ GROUP BY country
 ORDER BY 2 DESC
 ;
 
--- total laid off per year
 SELECT YEAR(date) AS year, SUM(total_laid_off)
 FROM layoffs_staging2
 GROUP BY year
 ORDER BY 1 ASC
 ;
 
--- total laid off per month of years combined (month 1 of 2020, 2021, 2022 total laid off)
 SELECT MONTH(date) AS month, SUM(total_laid_off)
 FROM layoffs_staging2
 GROUP BY month
 ;
 
--- total laid off per month and year
 SELECT SUBSTRING(`date`,1,7) AS `MONTH`, SUM(total_laid_off)
 FROM layoffs_staging2
 WHERE SUBSTRING(`date`,1,7) IS NOT NULL
